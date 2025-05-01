@@ -19,7 +19,7 @@ public class BoardController {
     @PostMapping("/board/{id}/update")
     public String update(@PathVariable("id") Integer id, @Valid BoardRequest.UpdateDTO reqDTO, Errors errors) {
         User sessionUser = (User) session.getAttribute("sessionUser");
-        boardService.글수정하기(reqDTO, id, sessionUser.getId());
+        BoardResponse.DTO respDTO = boardService.글수정하기(reqDTO, id, sessionUser.getId());
 
         return "redirect:/board/" + id;
     }
@@ -27,8 +27,8 @@ public class BoardController {
     @GetMapping("/board/{id}/update-form")
     public String updateForm(@PathVariable("id") int id, HttpServletRequest request) {
         User sessionUser = (User) session.getAttribute("sessionUser");
-        Board board = boardService.업데이트글보기(id, sessionUser.getId());
-        request.setAttribute("model", board);
+        BoardResponse.UpdateFormDTO respDTO = boardService.업데이트글보기(id, sessionUser.getId());
+        request.setAttribute("model", respDTO);
         return "board/update-form";
     }
 

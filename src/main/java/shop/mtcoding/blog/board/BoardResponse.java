@@ -28,6 +28,23 @@ public class BoardResponse {
         }
     }
 
+    @Data
+    public static class UpdateFormDTO {
+        private Integer id; //pk는 반드시 가져간다.
+        private String title;
+        private String content;
+        private Boolean isPublic;
+//        private Integer userId; // 화면x :개인 식별키는 들고가봤자 의미가 없다.(사용불가)
+//        private String createdAt;
+
+        public UpdateFormDTO(Board board) {
+            this.id = board.getId();
+            this.title = board.getTitle();
+            this.content = board.getContent();
+            this.isPublic = board.getIsPublic();
+        }
+    }
+
 
     @Data
     public static class ListDTO {
