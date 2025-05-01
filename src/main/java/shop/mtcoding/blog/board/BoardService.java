@@ -19,9 +19,8 @@ public class BoardService {
     private final LoveRepository loveRepository;
     private final ReplyRepository replyRepository;
 
-    // TODO 과제1
     @Transactional
-    public void 글수정하기(BoardRequest.UpdateDTO reqDTO, Integer boardId, Integer sessionUserId) {
+    public BoardResponse.DTO 글수정하기(BoardRequest.UpdateDTO reqDTO, Integer boardId, Integer sessionUserId) {
         Board boardPS = boardRepository.findById(boardId);
 
         if (boardPS == null) throw new Exception404("자원을 찾을 수 없습니다");
@@ -31,11 +30,18 @@ public class BoardService {
         }
 
         boardPS.update(reqDTO.getTitle(), reqDTO.getContent(), reqDTO.getIsPublic());
+
+        return new BoardResponse.DTO(boardPS);
     } // 더티 체킹 (상태 변경해서 update)
 
-    // TODO 과제2
-    public void 글삭제() {
-
+    @Transactional
+    public void 글삭제(Integer id, Integer sessionUserId) {
+        Board boardPS = boardRepository.findById(id);
+        if (boardPS == null) throw new Exception404("자원을 찾을 수 없습니다");
+        if (!boardPS.getUser().getId().equals(sessionUserId)) {
+            throw new Exception403("권한이 없습니다");
+        }
+        boardRepository.deleteById(id);
     }
 
     public BoardResponse.ListDTO 글목록보기(Integer userId, Integer page, String keyword) {
@@ -61,7 +67,6 @@ public class BoardService {
     public BoardResponse.DetailDTO 글상세보기(Integer id, Integer userId) {
         Board boardPS = boardRepository.findByIdJoinUserAndReplies(id);
 
-
         Love love = loveRepository.findByUserIdAndBoardId(userId, id);
         Long loveCount = loveRepository.findByBoardId(id);
 
@@ -72,13 +77,14 @@ public class BoardService {
         return detailDTO;
     }
 
-    public Board 업데이트글보기(int id, Integer sessionUserId) {
+    // 규칙4 : 화면에 보이는 데이터 + 반드시 PK는 포함되어야 한다.
+    public BoardResponse.UpdateFormDTO 업데이트글보기(int id, Integer sessionUserId) {
         Board boardPS = boardRepository.findById(id);
         if (boardPS == null) throw new Exception404("자원을 찾을 수 없습니다");
 
         if (!boardPS.getUser().getId().equals(sessionUserId)) {
             throw new Exception403("권한이 없습니다");
         }
-        return boardPS;
+        return new BoardResponse.UpdateFormDTO(boardPS);
     }
 }
