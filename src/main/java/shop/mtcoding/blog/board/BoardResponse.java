@@ -8,23 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BoardResponse {
-    @Data
-    public static class UpdateFormDTO {
-        private Integer id; // pk는 반드시 가져간다.
-        private String title;
-        private String content;
-        private Boolean isPublic;
-        //private Integer userId; // 화면X : 개인 식별키는 들고가봤자 의미가 없다. (사용불가)
-        //private String createdAt;
-
-        public UpdateFormDTO(Board board) {
-            this.id = board.getId();
-            this.title = board.getTitle();
-            this.content = board.getContent();
-            this.isPublic = board.getIsPublic();
-        }
-    }
-
 
     @Data
     public static class DTO {
@@ -47,7 +30,7 @@ public class BoardResponse {
 
     @Data
     public static class ListDTO {
-        private List<Board> boards;
+        private List<DTO> boards;
         private Integer prev;
         private Integer next;
         private Integer current;
@@ -60,7 +43,7 @@ public class BoardResponse {
         private String keyword;
 
         public ListDTO(List<Board> boards, Integer current, Integer totalCount, String keyword) {
-            this.boards = boards;
+            this.boards = boards.stream().map(board -> new DTO(board)).toList();
             this.prev = current - 1;
             this.next = current + 1;
             this.size = 3;

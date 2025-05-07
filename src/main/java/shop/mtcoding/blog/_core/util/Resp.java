@@ -10,6 +10,9 @@ public class Resp<T> {
     private String msg;
     private T body;
 
+    private Resp() {
+    }
+
     public static <B> Resp<?> ok(B body) {
         return new Resp<>(200, "성공", body);
     }
