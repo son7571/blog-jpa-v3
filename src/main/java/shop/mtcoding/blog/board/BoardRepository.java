@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Repository
@@ -24,8 +25,8 @@ public class BoardRepository {
         return (Board) query.getSingleResult();
     }
 
-    public Board findById(Integer id) {
-        return em.find(Board.class, id);
+    public Optional<Board> findById(Integer id) {
+        return Optional.ofNullable(em.find(Board.class, id));
     }
 
     // 그룹 함수 : Long 리턴

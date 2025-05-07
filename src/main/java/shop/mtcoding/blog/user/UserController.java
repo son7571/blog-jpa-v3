@@ -12,6 +12,7 @@ import shop.mtcoding.blog._core.util.Resp;
 
 import java.util.Map;
 
+// todo: 미완 JWT 배우고 응답 완료하기
 @RequiredArgsConstructor
 @Controller
 public class UserController {
@@ -19,12 +20,10 @@ public class UserController {
     private final HttpSession session;
 
     // TODO: JWT 이후에
-    @PostMapping("/user/update")
-    public String update(@Valid UserRequest.UpdateDTO updateDTO, Errors errors) {
+    @PutMapping("/user")
+    public String update(@Valid @RequestBody UserRequest.UpdateDTO updateDTO, Errors errors) { //xwformurl 반드시 외우기
         User sessionUser = (User) session.getAttribute("sessionUser");
-        // update user_tb set password = ?, email = ? where id = ?
         User userPS = userService.회원정보수정(updateDTO, sessionUser.getId());
-        // 세션 동기화
         session.setAttribute("sessionUser", userPS);
         return "redirect:/";
     }
@@ -44,7 +43,7 @@ public class UserController {
 
     // TODO: JWT 이후에
     @PostMapping("/login")
-    public String login(@Valid UserRequest.LoginDTO loginDTO, Errors errors, HttpServletResponse response) {
+    public String login(@Valid @RequestBody UserRequest.LoginDTO loginDTO, Errors errors, HttpServletResponse response) {
         //System.out.println(loginDTO);
         User sessionUser = userService.로그인(loginDTO);
         session.setAttribute("sessionUser", sessionUser);

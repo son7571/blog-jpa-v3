@@ -34,7 +34,8 @@ public class BoardRepositoryTest {
     public void findById_test() {
         // given
         Integer boardId = 4;
-        Board board = boardRepository.findById(boardId);
+        Board boardPS = boardRepository.findById(boardId)
+                .orElseThrow(() -> new RuntimeException("Board not found"));
     }
 
     @Test
