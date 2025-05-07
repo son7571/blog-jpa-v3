@@ -14,16 +14,16 @@ public class LoveController {
     private final LoveService loveService;
     private final HttpSession session;
 
-    @PostMapping("/api/love")
+    @PostMapping("/s/api/love")
     public Resp<?> saveLove(@RequestBody @Valid LoveRequest.SaveDTO reqDTO, Errors errors) {
         User sessionUser = (User) session.getAttribute("sessionUser");
         LoveResponse.SaveDTO respDTO = loveService.좋아요(reqDTO, sessionUser.getId());
 
         return Resp.ok(respDTO);
     }
-    
 
-    @DeleteMapping("/api/love/{id}")
+
+    @DeleteMapping("/s/api/love/{id}")
     public Resp<?> deleteLove(@PathVariable("id") Integer id) {
         User sessionUser = (User) session.getAttribute("sessionUser");
         LoveResponse.DeleteDTO respDTO = loveService.좋아요취소(id, sessionUser.getId());

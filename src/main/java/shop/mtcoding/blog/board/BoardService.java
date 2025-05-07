@@ -7,7 +7,6 @@ import shop.mtcoding.blog._core.error.ex.Exception403;
 import shop.mtcoding.blog._core.error.ex.Exception404;
 import shop.mtcoding.blog.love.Love;
 import shop.mtcoding.blog.love.LoveRepository;
-import shop.mtcoding.blog.reply.ReplyRepository;
 import shop.mtcoding.blog.user.User;
 
 import java.util.List;
@@ -17,24 +16,21 @@ import java.util.List;
 public class BoardService {
     private final BoardRepository boardRepository;
     private final LoveRepository loveRepository;
-    private final ReplyRepository replyRepository;
 
-    // TODO 과제1
     @Transactional
-    public BoardResponse.DTO 글수정하기(BoardRequest.UpdateDTO reqDTO, Integer boardId, Integer sessionUserId) {
-        Board boardPS = boardRepository.findById(boardId)
+    public BoardResponse.DTO 글수정하기(BoardRequest.UpdateDTO reqDTO, Integer id, Integer sessionUserId) {
+        Board boardPS = boardRepository.findById(id)
                 .orElseThrow(() -> new Exception404("자원을 찾을 수 없습니다"));
 
         if (!boardPS.getUser().getId().equals(sessionUserId)) {
             throw new Exception403("권한이 없습니다");
         }
 
-        boardPS.update(reqDTO.getTitle(), reqDTO.getContent(), reqDTO.isPublic());
+        boardPS.update(reqDTO.getTitle(), reqDTO.getContent(), reqDTO.getIsPublic());
 
         return new BoardResponse.DTO(boardPS);
     } // 더티 체킹 (상태 변경해서 update)
 
-    // TODO 과제2
     @Transactional
     public void 글삭제(Integer id, Integer sessionUserId) {
         Board boardPS = boardRepository.findById(id)
@@ -58,18 +54,19 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardResponse.DTO 글쓰기(BoardRequest.SaveDTO saveDTO, User sessionUser) {
-        Board board = saveDTO.toEntity(sessionUser);
-        Board boardPs = boardRepository.save(board);
-        return new BoardResponse.DTO(boardPs);
+    public BoardResponse.DTO 글쓰기(BoardRequest.SaveDTO reqDTO, User sessionUser) {
+        Board board = reqDTO.toEntity(sessionUser);
+        Board boardPS = boardRepository.save(board);
+        return new BoardResponse.DTO(boardPS);
     }
 
     @Transactional
     public BoardResponse.DetailDTO 글상세보기(Integer id, Integer userId) {
-        Board boardPS = boardRepository.findByIdJoinUserAndReplies(id);
+        Board boardPS = boardRepository.findByIdJoinUserAndReplies(id)
+                .orElseThrow(() -> new Exception404("자원을 찾을 수 없습니다"));
 
-
-        Love love = loveRepository.findByUserIdAndBoardId(userId, id);
+        Love love = loveRepository.findByUserIdAndBoardId(userId, id)
+                .orElseThrow(() -> new Exception404("자원을 찾을 수 없습니다"));
         Long loveCount = loveRepository.findByBoardId(id);
 
         Integer loveId = love == null ? null : love.getId();
@@ -79,11 +76,11 @@ public class BoardService {
         return detailDTO;
     }
 
-    // 규칙 4: 화면에 보이는 데이터 + 반드시 PK는 포함되어야 한다.
+    // 규칙4 : 화면에 보이는 데이터 + 반드시 PK는 포함되어야 한다.
     public BoardResponse.DTO 글보기(int id, Integer sessionUserId) {
         Board boardPS = boardRepository.findById(id)
                 .orElseThrow(() -> new Exception404("자원을 찾을 수 없습니다"));
-        
+
         if (!boardPS.getUser().getId().equals(sessionUserId)) {
             throw new Exception403("권한이 없습니다");
         }

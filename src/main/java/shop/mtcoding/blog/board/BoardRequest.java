@@ -8,14 +8,11 @@ public class BoardRequest {
 
     @Data
     public static class UpdateDTO {
-        // title=제목1&content=내용1 -> isPublic은 null이다.
-        // title=제목1&content=내용1&isPublic -> isPublic은 ""이다.
-        // title=제목1&content=내용1&isPublic=  -> isPublic은 " "이다.
-        @NotEmpty(message = "제목을 입력하세요") // null, space" ", 빈것""
+        @NotEmpty(message = "제목을 입력하세요")
         private String title;
         @NotEmpty(message = "내용을 입력하세요")
         private String content;
-        private boolean isPublic;
+        private Boolean isPublic;
 
         public Board toEntity(User user) {
             return Board.builder()

@@ -20,7 +20,7 @@ public class UserController {
     private final HttpSession session;
 
     // TODO: JWT 이후에
-    @PutMapping("/user")
+    @PutMapping("/s/api/user")
     public String update(@Valid @RequestBody UserRequest.UpdateDTO updateDTO, Errors errors) { //xwformurl 반드시 외우기
         User sessionUser = (User) session.getAttribute("sessionUser");
         User userPS = userService.회원정보수정(updateDTO, sessionUser.getId());

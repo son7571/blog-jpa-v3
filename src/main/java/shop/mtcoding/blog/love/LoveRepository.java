@@ -20,14 +20,15 @@ public class LoveRepository {
         return count;
     }
 
-    public Love findByUserIdAndBoardId(Integer userId, Integer boardId) {
+    public Optional<Love> findByUserIdAndBoardId(Integer userId, Integer boardId) {
         Query query = em.createQuery("select lo from Love lo where lo.user.id = :userId and lo.board.id = :boardId", Love.class);
         query.setParameter("userId", userId);
         query.setParameter("boardId", boardId);
         try {
-            return (Love) query.getSingleResult();
+            Love lovePs = (Love) query.getSingleResult();
+            return Optional.of(lovePs);
         } catch (Exception e) {
-            return null;
+            return Optional.ofNullable(null);
         }
     }
 
