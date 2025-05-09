@@ -24,7 +24,8 @@ public class OptionalTest {
     @Test
     public void t1() {
         String name = "metacoding";
-        Optional<String> opt = Optional.ofNullable(name);
+        Optional<String> opt = Optional.of(name);
+
         if (opt.isPresent()) {
             System.out.println(opt.get());
         } else {
@@ -38,6 +39,7 @@ public class OptionalTest {
         Optional<String> opt = Optional.ofNullable(name);
 
         String result = opt.orElseThrow(() -> new RuntimeException("값이 없어요"));
+        System.out.println(result);
 
     }
 

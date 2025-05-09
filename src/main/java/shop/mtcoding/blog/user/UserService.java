@@ -1,10 +1,12 @@
 package shop.mtcoding.blog.user;
 
 import lombok.RequiredArgsConstructor;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shop.mtcoding.blog._core.error.ex.Exception400;
-import shop.mtcoding.blog._core.error.ex.Exception401;
+import shop.mtcoding.blog._core.error.ex.ExceptionApi400;
+import shop.mtcoding.blog._core.error.ex.ExceptionApi401;
+import shop.mtcoding.blog._core.util.JwtUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,23 +22,29 @@ public class UserService {
     @Transactional
     public UserResponse.DTO 회원가입(UserRequest.JoinDTO reqDTO) {
         try {
+            String encPassword = BCrypt.hashpw(reqDTO.getPassword(), BCrypt.gensalt());
+            reqDTO.setPassword(encPassword);
             User userPS = userRepository.save(reqDTO.toEntity());
             return new UserResponse.DTO(userPS);
         } catch (Exception e) {
-            throw new Exception400("잘못된 요청입니다");
+            throw new ExceptionApi400("잘못된 요청입니다");
         }
 
     }
 
     // todo : A4용지에다가 id, username 적어, A4용지를 서명, A4용지를 돌려주기
-    public User 로그인(UserRequest.LoginDTO loginDTO) {
+    public UserResponse.TokenDTO 로그인(UserRequest.LoginDTO loginDTO) {
         User userPS = userRepository.findByUsername(loginDTO.getUsername())
-                .orElseThrow(() -> new Exception401("유저네임 혹은 비밀번호가 틀렸습니다"));
+                .orElseThrow(() -> new ExceptionApi401("유저네임 혹은 비밀번호가 틀렸습니다"));
 
-        if (!userPS.getPassword().equals(loginDTO.getPassword())) {
-            throw new Exception401("유저네임 혹은 비밀번호가 틀렸습니다");
-        }
-        return userPS;
+        Boolean isSame = BCrypt.checkpw(loginDTO.getPassword(), userPS.getPassword());
+
+        if (!isSame) throw new ExceptionApi401("유저네임 혹은 비밀번호가 틀렸습니다");
+
+        //토큰 생성
+        String accessToken = JwtUtil.create(userPS);
+
+        return UserResponse.TokenDTO.builder().access_token(accessToken).build();
     }
 
     public Map<String, Object> 유저네임중복체크(String username) {
