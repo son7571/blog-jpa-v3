@@ -47,8 +47,6 @@ public class AuthorizationFilter implements Filter {
             e3.printStackTrace();
             exResponse(response, e3.getMessage());
         }
-
-
     }
 
     private void exResponse(HttpServletResponse response, String msg) throws IOException {
