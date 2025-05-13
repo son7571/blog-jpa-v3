@@ -21,14 +21,14 @@ public class UserService {
     //RestAPI 규칙1: insert 요청시애 그 행을 dto에 담아서 리턴한다
     @Transactional
     public UserResponse.DTO 회원가입(UserRequest.JoinDTO reqDTO) {
-        try {
-            String encPassword = BCrypt.hashpw(reqDTO.getPassword(), BCrypt.gensalt());
-            reqDTO.setPassword(encPassword);
-            User userPS = userRepository.save(reqDTO.toEntity());
-            return new UserResponse.DTO(userPS);
-        } catch (Exception e) {
-            throw new ExceptionApi400("잘못된 요청입니다");
-        }
+        String encPassword = BCrypt.hashpw(reqDTO.getPassword(), BCrypt.gensalt());
+        reqDTO.setPassword(encPassword);
+
+        Optional<User> userOP = userRepository.findByUsername(reqDTO.getUsername());
+        if (userOP.isPresent()) throw new ExceptionApi400("중복된 유저네임이 존재합니다");
+
+        User userPS = userRepository.save(reqDTO.toEntity());
+        return new UserResponse.DTO(userPS);
 
     }
 
@@ -43,8 +43,12 @@ public class UserService {
 
         //토큰 생성
         String accessToken = JwtUtil.create(userPS);
+        String refreshToken = JwtUtil.createRefresh(userPS);
 
-        return UserResponse.TokenDTO.builder().access_token(accessToken).build();
+        // todo :RestAPI 전환끝나면 수업 해줄께요!!
+        // DB에 Device서명값(loginDTO), IP(request), User-Agent(request), RefreshToken(만든거 사용)
+
+        return UserResponse.TokenDTO.builder().access_token(accessToken).refresh_token(refreshToken).build();
     }
 
     public Map<String, Object> 유저네임중복체크(String username) {
@@ -59,13 +63,14 @@ public class UserService {
         return dto;
     }
 
-    // todo 규칙 3. :update된 데이터도 돌려줘야 함
+    // todo 규칙 3. :update된 데이터도 돌려줘야 함 (변경이 된 row를 돌려줘야 함)
     @Transactional
-    public User 회원정보수정(UserRequest.UpdateDTO updateDTO, Integer userId) {
+    public UserResponse.DTO 회원정보수정(UserRequest.UpdateDTO updateDTO, Integer userId) {
 
         User userPS = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("자원을 찾을 수 없습니다."));
 
-        return userPS; // 리턴한 이유는 세션을 동기화해야해서!!
+        userPS.update(updateDTO.getPassword(), updateDTO.getEmail());
+        return new UserResponse.DTO(userPS); // 리턴한 이유는 세션을 동기화해야해서!!
     } // 더티체킹 -> 상태가 변경되면 update을 날려요!!
 }

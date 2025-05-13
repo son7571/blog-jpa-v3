@@ -30,7 +30,7 @@ public class BoardRequest {
         private String title;
         @NotEmpty(message = "내용을 입력하세요")
         private String content;
-        private boolean isPublic;
+        private Boolean isPublic;
 
         public Board toEntity(User user) {
             return Board.builder()
