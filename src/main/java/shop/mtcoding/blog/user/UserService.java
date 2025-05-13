@@ -18,7 +18,7 @@ import java.util.Optional;
 @Service
 public class UserService {
     private final UserRepository userRepository;
- 
+
     // RestAPI 규칙1 : insert 요청시에 그 행을 dto에 담아서 리턴한다
     @Transactional
     public UserResponse.DTO 회원가입(UserRequest.JoinDTO reqDTO) {
@@ -45,8 +45,12 @@ public class UserService {
 
         // 토큰 생성
         String accessToken = JwtUtil.create(userPS);
+        String refreshToken = JwtUtil.createRefresh(userPS);
 
-        return UserResponse.TokenDTO.builder().accessToken(accessToken).build();
+        // TODO: RestAPI 전환 끝나면 수업 해줄께요!!
+        // DB에 Device서명값(LoginDTO), IP(request), User-Agent(request), RefreshToken(만든거 사용)
+
+        return UserResponse.TokenDTO.builder().accessToken(accessToken).refreshToken(refreshToken).build();
     }
 
     public Map<String, Object> 유저네임중복체크(String username) {
