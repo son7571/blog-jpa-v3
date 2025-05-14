@@ -41,14 +41,14 @@ public class UserService {
 
         if (!isSame) throw new ExceptionApi401("유저네임 혹은 비밀번호가 틀렸습니다");
 
-        //토큰 생성
+        // 토큰 생성
         String accessToken = JwtUtil.create(userPS);
         String refreshToken = JwtUtil.createRefresh(userPS);
 
-        // todo :RestAPI 전환끝나면 수업 해줄께요!!
-        // DB에 Device서명값(loginDTO), IP(request), User-Agent(request), RefreshToken(만든거 사용)
+        // TODO: RestAPI 전환 끝나면 수업 해줄께요!!
+        // DB에 Device서명값(LoginDTO), IP(request), User-Agent(request), RefreshToken(만든거 사용)
 
-        return UserResponse.TokenDTO.builder().access_token(accessToken).refresh_token(refreshToken).build();
+        return UserResponse.TokenDTO.builder().accessToken(accessToken).refreshToken(refreshToken).build();
     }
 
     public Map<String, Object> 유저네임중복체크(String username) {

@@ -7,13 +7,13 @@ public class UserResponse {
 
     @Data
     public static class TokenDTO {
-        private String access_token;
-        private String refresh_token;
+        private String accessToken;
+        private String refreshToken;
 
         @Builder
-        public TokenDTO(String access_token, String refresh_token) {
-            this.access_token = access_token;
-            this.refresh_token = refresh_token;
+        public TokenDTO(String accessToken, String refreshToken) {
+            this.accessToken = accessToken;
+            this.refreshToken = refreshToken;
         }
     }
 
