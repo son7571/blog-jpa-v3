@@ -1,6 +1,7 @@
 package shop.mtcoding.blog.integre;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,7 @@ import shop.mtcoding.blog._core.util.JwtUtil;
 import shop.mtcoding.blog.love.LoveRequest;
 import shop.mtcoding.blog.user.User;
 
-
+@Transactional
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 public class LoveControllerTest {
