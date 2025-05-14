@@ -36,8 +36,20 @@ public class TokenTest {
 
     @Test
     public void verity_test() {
-        // 2025.05.09.11.50분까지 유효
-        String jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJibG9ndjMiLCJpZCI6MSwiZXhwIjoxNzQ2NzU5ODg0LCJ1c2VybmFtZSI6InNzYXIifQ.X7_MF6bZkXkAljyU4ZBamm-ijpzRLUz62U0rc8U8390";
+        User user = User.builder()
+                .id(1)
+                .username("ssar")
+                .password("$2a$10$dd85C7oDcouLxnR1jYVXVOWbGdfzYOw9Q.pHvpOz0j4we7LEs8i.u")
+                .email("ssar@nate.com")
+                .createdAt(Timestamp.valueOf(LocalDateTime.now()))
+                .build();
+
+        String jwt = JWT.create()
+                .withSubject("blogv3") //크게중요하지 않고 아무거나 적어도 됨
+                .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) //중요함 시간에대해서 따로 공부할예정
+                .withClaim("id", user.getId()) //사용자를 식별할수있는 내용을 적는데 중요한내용인 PW는 적지않음
+                .withClaim("username", user.getUsername())
+                .sign(Algorithm.HMAC256("metacoding"));
 
         DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC256("metacoding")).build().verify(jwt);
         Integer id = decodedJWT.getClaim("id").asInt();
@@ -45,11 +57,6 @@ public class TokenTest {
 
         System.out.println(id);
         System.out.println(username);
-
-        User user = User.builder()
-                .id(id)
-                .username(username)
-                .build();
     }
 
 }
