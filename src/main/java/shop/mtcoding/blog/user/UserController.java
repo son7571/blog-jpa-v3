@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import shop.mtcoding.blog._core.util.Resp;
 
 import java.util.Map;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController // json만 리턴!!
 public class UserController {
@@ -32,6 +34,13 @@ public class UserController {
 
     @PostMapping("/join")
     public ResponseEntity<?> join(@Valid @RequestBody UserRequest.JoinDTO reqDTO, Errors errors) {
+        log.debug(reqDTO.toString());
+        log.trace("트레이스ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ");
+        log.debug("디버그---------");
+        log.info("인포ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ");
+        log.warn("워닝ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ");
+        log.error("에러ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ");
+
         UserResponse.DTO respDTO = userService.회원가입(reqDTO);
         return Resp.ok(respDTO);
     }
