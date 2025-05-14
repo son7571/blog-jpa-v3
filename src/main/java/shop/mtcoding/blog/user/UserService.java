@@ -22,16 +22,14 @@ public class UserService {
     // RestAPI 규칙1 : insert 요청시에 그 행을 dto에 담아서 리턴한다
     @Transactional
     public UserResponse.DTO 회원가입(UserRequest.JoinDTO reqDTO) {
-        try {
-            String encPassword = BCrypt.hashpw(reqDTO.getPassword(), BCrypt.gensalt());
-            reqDTO.setPassword(encPassword);
+        String encPassword = BCrypt.hashpw(reqDTO.getPassword(), BCrypt.gensalt());
+        reqDTO.setPassword(encPassword);
 
-            User userPS = userRepository.save(reqDTO.toEntity());
-            return new UserResponse.DTO(userPS);
-        } catch (Exception e) {
-            throw new ExceptionApi400("잘못된 요청입니다");
-        }
+        Optional<User> userOP = userRepository.findByUsername(reqDTO.getUsername());
+        if (userOP.isPresent()) throw new ExceptionApi400("중복된 유저네임이 존재합니다");
 
+        User userPS = userRepository.save(reqDTO.toEntity());
+        return new UserResponse.DTO(userPS);
     }
 
     // TODO : A4용지에다가 id, username 적어, A4용지를 서명, A4용지를 돌려주기
@@ -53,6 +51,7 @@ public class UserService {
         return UserResponse.TokenDTO.builder().accessToken(accessToken).refreshToken(refreshToken).build();
     }
 
+
     public Map<String, Object> 유저네임중복체크(String username) {
         Optional<User> userOP = userRepository.findByUsername(username);
         Map<String, Object> dto = new HashMap<>();
@@ -66,14 +65,14 @@ public class UserService {
     }
 
 
-    // TODO: 규칙3 : update된 데이터도 돌려줘야 함
+    // TODO: 규칙3 : update된 데이터도 돌려줘야 함 (변경이 된 row를 돌려줘야 함)
     @Transactional
-    public User 회원정보수정(UserRequest.UpdateDTO updateDTO, Integer userId) {
+    public UserResponse.DTO 회원정보수정(UserRequest.UpdateDTO updateDTO, Integer userId) {
 
         User userPS = userRepository.findById(userId)
                 .orElseThrow(() -> new ExceptionApi404("자원을 찾을 수 없습니다"));
 
         userPS.update(updateDTO.getPassword(), updateDTO.getEmail()); // 영속화된 객체의 상태변경
-        return userPS; // 리턴한 이유는 세션을 동기화해야해서!!
+        return new UserResponse.DTO(userPS); // 리턴한 이유는 세션을 동기화해야해서!!
     } // 더티체킹 -> 상태가 변경되면 update을 날려요!!
 }
