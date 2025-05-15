@@ -12,6 +12,7 @@ import shop.mtcoding.blog._core.util.Resp;
 
 import java.util.Map;
 
+
 @Slf4j
 @RequiredArgsConstructor
 @RestController // json만 리턴!!
@@ -31,6 +32,7 @@ public class UserController {
         Map<String, Object> respDTO = userService.유저네임중복체크(username);
         return Resp.ok(respDTO);
     }
+
 
     @PostMapping("/join")
     public ResponseEntity<?> join(@Valid @RequestBody UserRequest.JoinDTO reqDTO, Errors errors) {
