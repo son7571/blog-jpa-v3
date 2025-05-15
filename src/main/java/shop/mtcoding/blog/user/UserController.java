@@ -1,5 +1,6 @@
 package shop.mtcoding.blog.user;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -35,13 +36,18 @@ public class UserController {
 
 
     @PostMapping("/join")
-    public ResponseEntity<?> join(@Valid @RequestBody UserRequest.JoinDTO reqDTO, Errors errors) {
+    public ResponseEntity<?> join(@Valid @RequestBody UserRequest.JoinDTO reqDTO, Errors errors, HttpServletResponse response, HttpServletRequest request) {
         log.debug(reqDTO.toString());
         log.trace("트레이스ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ");
         log.debug("디버그---------");
         log.info("인포ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ");
         log.warn("워닝ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ");
         log.error("에러ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ");
+
+        String hello = request.getHeader("X-Key");
+        System.out.println("X-good : " + hello);
+
+        response.setHeader("Authorization", "jooho");
 
         UserResponse.DTO respDTO = userService.회원가입(reqDTO);
         return Resp.ok(respDTO);

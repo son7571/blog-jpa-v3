@@ -19,7 +19,7 @@ public class CorsFilter implements Filter {
         log.debug("Origin : " + origin);
 
         response.setHeader("Access-Control-Allow-Origin", "http://127.0.0.1:5500");
-        //response.setHeader("Access-Control-Expose-Headers", "Authorization"); // 이 헤더 응답할지 말지?
+        response.setHeader("Access-Control-Expose-Headers", "Authorization"); // 이 헤더 응답을 자바스크립트로 접근하게 허용할지!!
         response.setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, DELETE, OPTIONS");
         response.setHeader("Access-Control-Max-Age", "3600");
         response.setHeader("Access-Control-Allow-Headers", "Origin, X-Key, Content-Type, Accept, Authorization");
