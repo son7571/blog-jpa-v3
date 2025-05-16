@@ -67,8 +67,8 @@
 - CORS (Cross Origin Resource Sharing) -> 모든 서버는 JS요청을 거부한다.
 - 통합 테스트 (DS-C-S-R-PC-DB)
 - 빌드 해보기
-- 로그 설정하기 (v1 - api sentry, v2, v3)
-- API 문서 만들기
+- 로그 설정하기 (v1 - log level, v2 - api sentry, v3 - cloud 제공해주는 log)
+- API 문서 만들기 5월15일날
 
 ## 기술스택
 
@@ -86,3 +86,59 @@
 - h2
 - MySQL
 - Mustache
+
+## 테이블 스키마
+
+```sql
+create
+database blogdb;
+
+use
+blogdb;
+
+create table user_tb
+(
+    id         integer auto_increment,
+    created_at timestamp(6),
+    email      varchar(255),
+    password   varchar(255),
+    username   varchar(255) unique,
+    primary key (id)
+) character set utf8mb4 collate utf8mb4_general_ci;
+
+create table board_tb
+(
+    id         integer auto_increment,
+    is_public  boolean,
+    user_id    integer,
+    created_at timestamp(6),
+    content    varchar(255),
+    title      varchar(255),
+    primary key (id),
+    foreign key (user_id) references user_tb (id)
+) character set utf8mb4 collate utf8mb4_general_ci;
+
+create table love_tb
+(
+    id         integer auto_increment,
+    board_id   integer,
+    user_id    integer,
+    created_at timestamp(6),
+    primary key (id),
+    unique (user_id, board_id),
+    foreign key (board_id) references board_tb (id),
+    foreign key (user_id) references user_tb (id)
+) character set utf8mb4 collate utf8mb4_general_ci;
+
+create table reply_tb
+(
+    id         integer auto_increment,
+    board_id   integer,
+    user_id    integer,
+    created_at timestamp(6),
+    content    varchar(255),
+    primary key (id),
+    foreign key (board_id) references board_tb (id),
+    foreign key (user_id) references user_tb (id)
+) character set utf8mb4 collate utf8mb4_general_ci;
+```
