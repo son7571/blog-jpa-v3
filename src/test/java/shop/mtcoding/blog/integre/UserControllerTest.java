@@ -7,13 +7,13 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import shop.mtcoding.blog.MyRestDoc;
 import shop.mtcoding.blog._core.util.JwtUtil;
 import shop.mtcoding.blog.user.User;
 import shop.mtcoding.blog.user.UserRequest;
@@ -21,15 +21,13 @@ import shop.mtcoding.blog.user.UserRequest;
 import static org.hamcrest.Matchers.matchesPattern;
 
 // 컨트롤러 통합 테스트
+
 @Transactional
-@AutoConfigureMockMvc // MockMvc 클래스가 IoC에 로드 | RestTemplate -> 자바스크립트의 fetch와 동일, 진짜 환경에 요청 가능
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK) // MOCK -> 가짜 환경을 만들어 필요한 의존관계를 다 메모리에 올려서 테스트
-public class UserControllerTest {
+public class UserControllerTest extends MyRestDoc {
 
     @Autowired
     private ObjectMapper om; // json <-> java Object 변환 해주는 객체. IoC에 objectMapper가 이미 떠있음
-    @Autowired
-    private MockMvc mvc; // 가짜 환경에서 fetch 요청하는 클래스 | RestTemplate -> 자바스크립트의 fetch와 동일, 진짜 환경에 요청 가능
 
     private String accessToken;
 
@@ -77,6 +75,7 @@ public class UserControllerTest {
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.status").value(400));
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.msg").value("중복된 유저네임이 존재합니다"));
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.body").value(Matchers.nullValue()));
+        actions.andDo(MockMvcResultHandlers.print()).andDo(document);
     }
 
     @Test
@@ -108,6 +107,7 @@ public class UserControllerTest {
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.id").value(4));
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.username").value("haha"));
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.email").value("haha@nate.com"));
+        actions.andDo(MockMvcResultHandlers.print()).andDo(document);
     }
 
     @Test
@@ -136,6 +136,7 @@ public class UserControllerTest {
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.msg").value("성공"));
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.accessToken",
                 matchesPattern("^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+$")));
+        actions.andDo(MockMvcResultHandlers.print()).andDo(document);
     }
 
     @Test
@@ -168,10 +169,11 @@ public class UserControllerTest {
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.email").value("ssar@gmail.com"));
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.createdAt",
                 matchesPattern("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d+")));
+        actions.andDo(MockMvcResultHandlers.print()).andDo(document);
     }
 
     @Test
-    public void checkUsernameAvailable_test() throws Exception {
+    public void check_username_available_test() throws Exception {
         // given
         String username = "ssar";
 
@@ -189,5 +191,6 @@ public class UserControllerTest {
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200));
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.msg").value("성공"));
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.available").value(false));
+        actions.andDo(MockMvcResultHandlers.print()).andDo(document);
     }
 }

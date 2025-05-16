@@ -2,6 +2,8 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.2.2'
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    // 1. 문서 만들기
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
 }
 
 group = 'shop.mtcoding'
@@ -22,7 +24,9 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+    // 2. 문서만들기
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation group: 'com.auth0', name: 'java-jwt', version: '4.3.0'
@@ -37,9 +41,32 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
+//3. 문서 만들기
+//1. gradlew build (test코드 실행 -> 결과 build/generated-snippets 에 copy한다. *.adoc)
+ext {
+    set('snippetsDir', file("build/generated-snippets"))
+}
 
+//2. gradlew build (test코드 실행 -> 진짜로 1번의 결과가 실행됨)
 tasks.named('test') {
+    outputs.dir snippetsDir
     useJUnitPlatform()
+}
+
+//3. 테스트가 종료되면 asciidoctor 실행 -> *.docs 파일들을 가지고 하나의 .adoc 파일로 변경 (src/docs/asciidoc)
+tasks.named('asciidoctor') {
+    inputs.dir snippetsDir
+    dependsOn test
+}
+
+//4. HTML 파일을 서버에서 열어볼 수있게 copy
+bootJar {
+    dependsOn asciidoctor
+    copy {
+        // src/docs/asciidoc == from 경로
+        from "${asciidoctor.outputDir}"
+        into 'src/main/resources/static/docs'    // /static/docs로 복사!
+    }
 }
 
 // plain 파일 생성하지 않기
