@@ -41,32 +41,33 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
-//3. 문서 만들기
-//1. gradlew build (test코드 실행 -> 결과 build/generated-snippets 에 copy한다. *.adoc)
+// 3. 문서만들기
+// 1. gradlew build (test코드 실행 -> 결과 build/generated-snippets 에 copy한다. *.adoc) - 변수 설정 완료
 ext {
     set('snippetsDir', file("build/generated-snippets"))
 }
 
-//2. gradlew build (test코드 실행 -> 진짜로 1번의 결과가 실행됨)
+// 2. gradlew build (test코드 실행 -> 진짜로 1번의 결과가 실횅됨)
 tasks.named('test') {
     outputs.dir snippetsDir
     useJUnitPlatform()
 }
 
-//3. 테스트가 종료되면 asciidoctor 실행 -> *.docs 파일들을 가지고 하나의 .adoc 파일로 변경 (src/docs/asciidoc)
+// 3. 테스트가 종료되면 asciidoctor 실행 -> *.adoc 파일들을 가지고 하나의 .adoc 파일로 변경 (src/docs/asciidoc)
 tasks.named('asciidoctor') {
     inputs.dir snippetsDir
     dependsOn test
 }
 
-//4. HTML 파일을 서버에서 열어볼 수있게 copy
-bootJar {
-    dependsOn asciidoctor
-    copy {
-        // src/docs/asciidoc == from 경로
-        from "${asciidoctor.outputDir}"
-        into 'src/main/resources/static/docs'    // /static/docs로 복사!
-    }
+// 4. HTML 파일을 서버에서 열어볼 수 있게 Copy
+tasks.register('copyRestDocs', Copy) {
+    dependsOn tasks.named('asciidoctor')
+    from "${asciidoctor.outputDir}"  // asciidoctor 결과 위치
+    into "src/main/resources/static/docs"
+}
+
+tasks.named('bootJar') {
+    dependsOn tasks.named('copyRestDocs')
 }
 
 // plain 파일 생성하지 않기
